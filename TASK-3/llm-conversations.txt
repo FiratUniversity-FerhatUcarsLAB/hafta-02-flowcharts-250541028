@@ -1,0 +1,397 @@
+AD SOYAD :NUH DAĞ
+ÖĞRENCİ NO:250541028
+
+Sistem A¸cıklaması
+Hastanede randevu alma ve tahlil sonu¸clarına eri¸sim sistemini modelleyin.
+Sistem Gereksinimleri:
+Hasta kimlik do˘grulama (TC No)
+˙
+I¸slem se¸cimi: 1-Randevu Al, 2-Tahlil Sonucu G¨or (ko¸sul)
+Randevu mod¨ul¨u: Poliklinik se¸cimi, doktor listesi, uygun saatler
+(d¨ong¨u)
+Randevu onayı ve SMS g¨onderimi
+Tahlil mod¨ul¨u: Tahlil var mı kontrol¨u (ko¸sul)
+Sonu¸c hazır mı kontrol¨u (ko¸sul)
+Sonu¸c g¨or¨unt¨uleme veya bekleme mesajı
+Sonu¸cları PDF indir se¸cene˘gi
+Ba¸ska i¸slem yapmak ister misiniz? (d¨ong¨u)
+Zorluk: Zor
+˙
+Iki ayrı mod¨ul ve birden fazla ko¸sul/d¨ong¨u kombinasyonu!
+F.U - O.M.K (TF Yazılım M¨uh.) ¨ Hafta 2 - Akı¸s Diyagramları Lab 5 Ekim 2025 14 / 32
+G¨orev 3: LLM ile Mod¨uler Yakla¸sım
+˙Iki Mod¨ul¨u Ayrı Ayrı C¸ alı¸sın:
+Mod¨ul 1: Randevu Alma
+“Hastane randevu sistemi i¸cin algoritma: kimlik do˘grulama, poliklinik
+se¸cimi, doktor listesi g¨or¨unt¨uleme, uygun saatleri g¨osterme, randevu
+onaylama ve SMS g¨onderme. Pseudocode yaz.”
+ChatGPT:
+
+Harika 👏
+Bu görev, “Hastane Randevu ve Tahlil Sonuç Sistemi” için iki modüler alt sistemin (Randevu Alma & Tahlil Sonuç Görme) koşul ve döngülerle modellenmesini istiyor.
+Aşağıda önce SİSTEM AÇIKLAMASI, ardından Modül 1: Randevu Alma Pseudocode (istenen kısım) yer alıyor.
+
+🏥 SİSTEM AÇIKLAMASI
+🎯 Sistem Adı:
+
+Hastane Randevu Alma ve Tahlil Sonuç Görme Sistemi
+
+🧠 Sistem Amacı:
+
+Bu sistem, hastaların kimlik doğrulaması yaparak hastanede randevu oluşturma veya tahlil sonuçlarını görüntüleme işlemlerini gerçekleştirmesini sağlar.
+Kullanıcı, giriş yaptıktan sonra yapmak istediği işlemi seçer. Sistem, seçilen modüle göre farklı akışlara yönlendirilir.
+
+⚙️ Sistem İşleyişi (Genel Bakış):
+
+Hasta Kimlik Doğrulama:
+Kullanıcı TC kimlik numarasını girer.
+TC geçerliyse sisteme giriş yapılır, değilse hata mesajı gösterilir.
+
+İşlem Seçimi (Koşul):
+
+Seçenek 1: Randevu Al
+
+Seçenek 2: Tahlil Sonuçlarını Gör
+Kullanıcı seçimine göre sistem ilgili modüle yönlenir.
+
+Randevu Modülü (Döngü ve Koşullar):
+
+Poliklinik seçimi yapılır.
+
+Seçilen polikliniğe ait doktor listesi gösterilir.
+
+Uygun saatler listelenir.
+
+Hasta uygun saati seçip randevuyu onaylar.
+
+Onay sonrası SMS bilgilendirmesi yapılır.
+
+Tahlil Modülü (Koşullar ve Döngü):
+
+Sistemde tahlil kaydı olup olmadığı kontrol edilir.
+
+Varsa, sonuç hazır mı kontrol edilir.
+
+Hazırsa sonuç görüntülenir.
+
+Henüz hazır değilse “Sonuç bekleniyor” mesajı gösterilir.
+
+Kullanıcı isterse sonucu PDF olarak indirebilir.
+
+İşlem Tekrarı (Döngü):
+Sistem her işlem sonrası “Başka bir işlem yapmak ister misiniz?” sorusunu sorar.
+“Evet” seçilirse ana menüye dönülür, “Hayır” seçilirse sistem sonlanır.
+
+🧩 MODÜL 1: Randevu Alma Pseudocode
+BASLA
+
+    // 1. Kimlik Doğrulama
+    Yaz("Lütfen TC Kimlik Numaranızı Giriniz:")
+    TC = girdi_al()
+
+    EGER kimlik_dogrula(TC) ISE
+        Yaz("Kimlik doğrulandı. Hoş geldiniz.")
+    DEGILSE
+        Yaz("Geçersiz TC Kimlik Numarası!")
+        BITIR
+    SON
+
+    // 2. Poliklinik Seçimi
+    DONGU poliklinik_secimi_devam == TRUE
+        poliklinik_listesini_goster()
+        poliklinik = poliklinik_sec()
+
+        EGER poliklinik != BOS ISE
+            Yaz("Poliklinik seçildi: " + poliklinik)
+            // 3. Doktor Listesi
+            doktor_listesini_goster(poliklinik)
+            doktor = doktor_sec()
+
+            EGER doktor != BOS ISE
+                Yaz("Seçilen Doktor: " + doktor)
+                // 4. Uygun Saatler
+                uygun_saatleri_goster(doktor)
+                saat = saat_sec()
+
+                EGER saat != BOS ISE
+                    // 5. Randevu Onayı
+                    Yaz("Randevu onaylanıyor...")
+                    randevu_onayla(TC, doktor, saat)
+                    // 6. SMS Gönderimi
+                    sms_gonder(TC, doktor, saat)
+                    Yaz("Randevunuz başarıyla oluşturuldu ve SMS gönderildi.")
+                    poliklinik_secimi_devam = FALSE
+                DEGILSE
+                    Yaz("Lütfen uygun bir saat seçiniz.")
+                SON
+            DEGILSE
+                Yaz("Doktor seçilmedi.")
+            SON
+        DEGILSE
+            Yaz("Poliklinik seçimi yapılmadı.")
+        SON
+    SON
+
+BITIR
+
+🔍 Kontrol Noktaları:
+No	Kontrol Noktası	Türü	Açıklama
+1	Kimlik doğrulama	Koşul	TC numarasının geçerliliği
+2	Poliklinik seçimi	Döngü/Koşul	Geçerli poliklinik seçimi yapılana kadar tekrarlar
+3	Doktor seçimi	Koşul	Boş seçim yapılırsa uyarı verir
+4	Saat seçimi	Koşul	Uygun saat seçilene kadar tekrar edilir
+5	Randevu onayı	İşlem	Seçilen bilgilere göre kayıt oluşturulur
+6	SMS gönderimi	İşlem	Randevu sonrası bilgilendirme
+
+İstersen şimdi Modül 2: Tahlil Sonucu Görme kısmını da aynı formatta (BASLA/BITIR, EGER-ISE, DONGU) şeklinde yazabilirim.
+Devam edeyim mi?
+
+Şunu dedin:
+PSEUDOCODE KODUNA ÇEVİR
+ChatGPT:
+
+Harika 👍
+İstediğin şey, “Hastane Randevu Alma Sistemi” için yukarıdaki açıklamayı tam formatlı PSEUDOCODE biçimine çevirmek.
+Yani:
+
+Her işlem BASLA ile başlasın, BITIR ile bitsin.
+
+Koşullar: EGER ... ISE ... DEGILSE ... SON
+
+Döngüler: DONGU ... SON
+
+Tüm kontrol noktaları açıkça gösterilsin.
+
+İşte talebine birebir uygun biçimde yazılmış Modül 1: Randevu Alma Pseudocode 👇
+
+🧠 PSEUDOCODE – Hastane Randevu Alma Sistemi
+BASLA
+
+    // Kimlik Doğrulama
+    Yaz("Lütfen TC Kimlik Numaranızı Giriniz:")
+    TC = Girdi_Al()
+
+    EGER Kimlik_Dogrula(TC) ISE
+        Yaz("Kimlik doğrulandı. Hoş geldiniz.")
+    DEGILSE
+        Yaz("Geçersiz TC Kimlik Numarası! Lütfen tekrar deneyiniz.")
+        BITIR
+    SON
+
+    // Randevu Alma Modülü
+    DONGU poliklinik_secimi_devam == TRUE
+
+        // Poliklinik Seçimi
+        Yaz("Mevcut Poliklinikler:")
+        Poliklinik_Listesini_Goster()
+        poliklinik = Poliklinik_Sec()
+
+        EGER poliklinik != BOS ISE
+            Yaz("Seçilen Poliklinik: " + poliklinik)
+
+            // Doktor Listesi
+            Doktor_Listesini_Goster(poliklinik)
+            doktor = Doktor_Sec()
+
+            EGER doktor != BOS ISE
+                Yaz("Seçilen Doktor: " + doktor)
+
+                // Uygun Saat Seçimi
+                Uygun_Saatleri_Goster(doktor)
+                saat = Saat_Sec()
+
+                EGER saat != BOS ISE
+                    // Randevu Onayı
+                    Yaz("Randevu onaylanıyor...")
+                    Randevu_Onayla(TC, poliklinik, doktor, saat)
+
+                    // SMS Gönderimi
+                    SMS_Gonder(TC, doktor, saat)
+                    Yaz("Randevunuz başarıyla oluşturuldu. Onay SMS'i gönderildi.")
+                    poliklinik_secimi_devam = FALSE
+                DEGILSE
+                    Yaz("Uygun saat seçilmedi. Lütfen tekrar deneyin.")
+                SON
+
+            DEGILSE
+                Yaz("Doktor seçimi yapılmadı. Lütfen tekrar deneyin.")
+            SON
+
+        DEGILSE
+            Yaz("Poliklinik seçimi yapılmadı. Lütfen bir poliklinik seçin.")
+        SON
+
+    SON
+
+    Yaz("Randevu Alma İşlemi Tamamlandı.")
+
+BITIR
+
+⚙️ Yapısal Özellikler:
+Yapı	Anlamı	Kullanım Amacı
+BASLA / BITIR	Süreç başlangıcı ve sonu	Algoritmanın sınırlarını belirler
+EGER ... ISE ... DEGILSE ... SON	Karar yapısı	Kimlik, poliklinik, doktor, saat kontrolleri
+DONGU ... SON	Tekrarlayan işlem	Geçerli poliklinik seçilene kadar döner
+Yaz()	Çıktı işlemi	Kullanıcı bilgilendirme mesajları
+Girdi_Al()	Girdi alma işlemi	TC, poliklinik, doktor, saat seçimi
+
+İstersen şimdi aynı şekilde Modül 2: Tahlil Sonuç Görme sistemini de bu biçimde yazabilirim.
+Devam edeyim mi (Adım 2: Tahlil Modülü Pseudocode)?
+
+Şunu dedin:
+Mod¨ul 2: Tahlil Sonu¸cları
+“Tahlil sonucu g¨or¨unt¨uleme sistemi: kimlik do˘grulama, tahlil varlı˘gı
+kontrol¨u, sonu¸c hazır mı kontrol¨u, g¨or¨unt¨uleme veya bekleme mesajı, PDF
+indirme. Pseudocode yaz.”
+Son Adım: Birle¸stirme
+Ana men¨u ile iki mod¨ul¨u birle¸stirin
+DOT kodunda her mod¨ul¨u ayrı subgraph olarak d¨uzenleyebilirsiniz
+ChatGPT:
+
+Mükemmel 👌
+Şimdi aşamaları tamamlayalım:
+1️⃣ Modül 2 (Tahlil Sonuçları) Pseudocode
+2️⃣ Ana Menü ile Birleştirilmiş Genel Sistem Pseudocode
+3️⃣ DOT kodu (iki modül subgraph olarak)
+
+🧩 MODÜL 2: Tahlil Sonuçları Pseudocode
+BASLA
+
+    // Kimlik Doğrulama
+    Yaz("Lütfen TC Kimlik Numaranızı Giriniz:")
+    TC = Girdi_Al()
+
+    EGER Kimlik_Dogrula(TC) ISE
+        Yaz("Kimlik doğrulandı. Hoş geldiniz.")
+    DEGILSE
+        Yaz("Geçersiz TC Kimlik Numarası! Lütfen tekrar deneyiniz.")
+        BITIR
+    SON
+
+    // Tahlil Sonuç Modülü
+    Yaz("Tahlil Sonuçlarınız Kontrol Ediliyor...")
+
+    EGER Tahlil_Varmi(TC) ISE
+        EGER Sonuc_Hazir_Mi(TC) ISE
+            Yaz("Tahlil Sonucu Hazır. Sonuçlar Gösteriliyor...")
+            Sonuclari_Goster(TC)
+
+            Yaz("PDF olarak indirmek ister misiniz? (E/H)")
+            cevap = Girdi_Al()
+
+            EGER cevap == "E" ISE
+                PDF_Indir(TC)
+                Yaz("Sonuçlar PDF olarak indirildi.")
+            DEGILSE
+                Yaz("PDF indirilmiyor, işlem tamamlandı.")
+            SON
+
+        DEGILSE
+            Yaz("Tahlil sonucu henüz hazır değil. Lütfen daha sonra tekrar deneyin.")
+        SON
+
+    DEGILSE
+        Yaz("Sistemde kayıtlı tahlil bulunamadı.")
+    SON
+
+    Yaz("Tahlil Modülü İşlemi Tamamlandı.")
+
+BITIR
+
+🔗 BİRLEŞTİRİLMİŞ ANA MENÜ PSEUDOCODE
+BASLA
+
+    Yaz("=== HASTANE RANDEVU VE TAHLİL SİSTEMİ ===")
+
+    DONGU devam == TRUE
+        Yaz("Lütfen yapmak istediğiniz işlemi seçiniz:")
+        Yaz("1 - Randevu Al")
+        Yaz("2 - Tahlil Sonuçlarını Gör")
+        Yaz("0 - Çıkış")
+
+        secim = Girdi_Al()
+
+        EGER secim == 1 ISE
+            // MODÜL 1: Randevu Alma
+            Cagir(Randevu_Alma_Modulu)
+        DEGILSE EGER secim == 2 ISE
+            // MODÜL 2: Tahlil Sonuçları
+            Cagir(Tahlil_Sonuc_Modulu)
+        DEGILSE EGER secim == 0 ISE
+            devam = FALSE
+            Yaz("Sistemden çıkılıyor...")
+        DEGILSE
+            Yaz("Geçersiz seçim! Lütfen tekrar deneyiniz.")
+        SON
+    SON
+
+    Yaz("İyi günler dileriz!")
+
+BITIR
+
+🎯 DOT (Graphviz) Diyagram Kodu — 2 Modüllü Ana Sistem
+digraph HastaneSistemi {
+    layout=dot;
+    rankdir=TB;
+    node [shape=box, style=rounded, fontname="Arial", fontsize=11];
+
+    // Ana Menü
+    Start [label="Başla"];
+    Menu [label="Ana Menü: 1-Randevu Al, 2-Tahlil Gör, 0-Çıkış"];
+    Exit [label="Çıkış"];
+    End [label="Bitiş"];
+
+    Start -> Menu;
+
+    // --- MODÜL 1: Randevu Alma ---
+    subgraph cluster_Randevu {
+        label="Randevu Modülü";
+        color=lightblue;
+        style=filled;
+        fillcolor="#E6F2FF";
+
+        R1 [label="TC Doğrulama"];
+        R2 [label="Poliklinik Seçimi"];
+        R3 [label="Doktor Seçimi"];
+        R4 [label="Uygun Saat Seçimi"];
+        R5 [label="Randevu Onayı ve SMS Gönderimi"];
+
+        R1 -> R2 -> R3 -> R4 -> R5;
+    }
+
+    // --- MODÜL 2: Tahlil Sonuçları ---
+    subgraph cluster_Tahlil {
+        label="Tahlil Sonuçları Modülü";
+        color=lightgreen;
+        style=filled;
+        fillcolor="#E9FFE9";
+
+        T1 [label="TC Doğrulama"];
+        T2 [label="Tahlil Varlığı Kontrolü"];
+        T3 [label="Sonuç Hazır mı?"];
+        T4 [label="Sonucu Görüntüle"];
+        T5 [label="PDF İndir"];
+
+        T1 -> T2 -> T3;
+        T3 -> T4 [label="Hazır"];
+        T3 -> T2 [label="Hazır Değil"];
+        T4 -> T5;
+    }
+
+    // Menü bağlantıları
+    Menu -> R1 [label="1 - Randevu Al"];
+    Menu -> T1 [label="2 - Tahlil Gör"];
+    Menu -> Exit [label="0 - Çıkış"];
+    Exit -> End;
+}
+
+⚙️ DOT Diyagramı Oluşturmak İçin:
+
+Kaydet → hastane_sistemi.dot
+Sonra terminalde şu komutu çalıştır:
+
+dot -Tpng hastane_sistemi.dot -o hastane_sistemi.png
+
+
+İstersen ben bu diyagramı senin için PNG veya PDF olarak üretebilirim.
+Hangisini istersin — 📄 PDF diyagram mı, yoksa 🖼️ PNG görsel mi?

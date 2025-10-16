@@ -1,0 +1,79 @@
+AD SOYAD:NUH DAĞ
+ÖĞRENCİ NUMARASI:250541028
+
+digraph ATM_ParaCekme {
+    rankdir = TB;
+    node [fontname = "Arial", fontsize = 10];
+
+    start [shape = oval, label = "BAŞLA"];
+    insert_card [shape = parallelogram, label = "Kartı takınız"];
+    enter_pin [shape = parallelogram, label = "PIN giriniz"];
+    check_pin [shape = diamond, label = "PIN doğru mu?"];
+    wrong_pin [shape = box, label = "Hata sayısını 1 artır"];
+    try_again [shape = parallelogram, label = "PIN giriniz (tekrar)"];
+    block_card [shape = oval, label = "Kart bloke oldu\nBİTİR"];
+
+    menu [shape = parallelogram, label = "Menü Göster:\n1. Bakiye\n2. Para Çek\n3. Çıkış"];
+    read_choice [shape = parallelogram, label = "Seçimi oku"];
+    choice_check [shape = diamond, label = "Seçim nedir?"];
+
+    balance [shape = parallelogram, label = "Bakiyeyi göster"];
+    withdraw [shape = parallelogram, label = "Tutar giriniz"];
+    check_balance [shape = diamond, label = "Yetersiz bakiye?"];
+    insufficient [shape = parallelogram, label = "Yetersiz bakiye uyarısı"];
+
+    check_multiple [shape = diamond, label = "20 TL'nin katı mı?"];
+    not_multiple [shape = parallelogram, label = "20 TL'nin katı olmalı uyarısı"];
+
+    check_limit [shape = diamond, label = "Günlük limit aşıldı mı?"];
+    limit_exceeded [shape = parallelogram, label = "Günlük limit aşıldı uyarısı"];
+
+    give_cash [shape = box, label = "Parayı ver, fiş çıkar"];
+    success [shape = parallelogram, label = "İşlem başarılı"];
+
+    another [shape = diamond, label = "Başka işlem? (E/H)"];
+    end_node [shape = oval, label = "Kart iade edildi\nİyi günler\nBİTİR"];
+    invalid [shape = parallelogram, label = "Geçersiz seçim uyarısı"];
+
+    start -> insert_card;
+    insert_card -> enter_pin;
+    enter_pin -> check_pin;
+
+    check_pin -> menu [label = "Evet"];
+    check_pin -> wrong_pin [label = "Hayır"];
+
+    wrong_pin -> block_card [label = "3 hata"];
+    wrong_pin -> try_again [label = "< 3 hata"];
+    try_again -> check_pin;
+
+    menu -> read_choice;
+    read_choice -> choice_check;
+
+    choice_check -> balance [label = "1"];
+    balance -> another;
+
+    choice_check -> withdraw [label = "2"];
+    withdraw -> check_balance;
+
+    check_balance -> insufficient [label = "Evet"];
+    insufficient -> withdraw;
+    check_balance -> check_multiple [label = "Hayır"];
+
+    check_multiple -> not_multiple [label = "Hayır"];
+    not_multiple -> withdraw;
+    check_multiple -> check_limit [label = "Evet"];
+
+    check_limit -> limit_exceeded [label = "Evet"];
+    limit_exceeded -> withdraw;
+    check_limit -> give_cash [label = "Hayır"];
+
+    give_cash -> success;
+    success -> another;
+
+    choice_check -> end_node [label = "3"];
+    choice_check -> invalid [label = "Diğer"];
+    invalid -> menu;
+
+    another -> menu [label = "E"];
+    another -> end_node [label = "H"];
+}

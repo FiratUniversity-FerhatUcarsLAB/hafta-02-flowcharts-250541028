@@ -1,0 +1,38 @@
+AD SOYAD :NUH DAĞ
+ÖĞRENCİ NO:250541028
+
+digraph AkilliEvSistemi {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+
+    Start [label="Başla"];
+    SistemAktif [label="Sistem Aktif mi?", shape=diamond];
+    SonsuzDongu [label="Sonsuz Döngü", shape=box];
+
+    Hareket [label="Hareket Sensörü?", shape=diamond];
+    KapiPencere [label="Kapı/Pencere Açık?", shape=diamond];
+    EvSahibi [label="Ev Sahibi Evde mi?", shape=diamond];
+    AlarmSeviye [label="Alarm Seviyesi Belirle", shape=box];
+    Bildirim [label="Bildirim Gönder (SMS, App, Email)", shape=box];
+    AlarmSifirla [label="Alarm Sıfırla?", shape=diamond];
+    End [label="Bitir"];
+
+    Start -> SistemAktif;
+    SistemAktif -> SonsuzDongu [label="Evet"];
+    SistemAktif -> End [label="Hayır"];
+
+    SonsuzDongu -> Hareket;
+    Hareket -> KapiPencere [label="Evet"];
+    Hareket -> EvSahibi [label="Hayır"];
+
+    KapiPencere -> EvSahibi [label="Evet"];
+    KapiPencere -> AlarmSeviye [label="Hayır"];
+
+    EvSahibi -> AlarmSeviye [label="Hayır"];
+    EvSahibi -> SonsuzDongu [label="Evet"];
+
+    AlarmSeviye -> Bildirim;
+    Bildirim -> AlarmSifirla;
+    AlarmSifirla -> SonsuzDongu [label="Devam", color=blue];
+    AlarmSifirla -> SonsuzDongu [label="Sıfırlandı", color=green];
+}

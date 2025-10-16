@@ -1,0 +1,29 @@
+AD SOYAD:NUH DAĞ
+ÖĞRENCİ NO:2505410028
+
+digraph OnlineShopping {
+    rankdir=TB;
+    node [shape=box, style=rounded, fontname="Arial"];
+
+    Start [label="Başla"];
+    Login [label="Kullanıcı Girişi Kontrolü"];
+    Browse [label="Ürün Kategorileri Arasında Gezinme"];
+    Select [label="Ürün Seçimi"];
+    Stock [label="Stok Kontrolü"];
+    AddCart [label="Sepete Ekle"];
+    ViewCart [label="Sepeti Görüntüleme ve Düzenleme"];
+    Discount [label="İndirim Kodu Uygulama"];
+    MinCheck [label="Minimum 50 TL Kontrolü"];
+    Shipping [label="Kargo Ücreti Hesaplama"];
+    Payment [label="Ödeme Yöntemi Seçimi"];
+    Confirm [label="Sipariş Onayı"];
+    End [label="Bitiş"];
+
+    Start -> Login -> Browse -> Select -> Stock;
+    Stock -> AddCart [label="Stok Var"];
+    Stock -> Browse [label="Stok Yok"];
+    AddCart -> ViewCart -> Discount -> MinCheck;
+    MinCheck -> Shipping [label=">= 50 TL"];
+    MinCheck -> ViewCart [label="< 50 TL"];
+    Shipping -> Payment -> Confirm -> End;
+}

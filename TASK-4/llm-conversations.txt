@@ -1,0 +1,441 @@
+AD SOYAD:NUH DAĞ
+ÖĞRENCİ NO:250541028
+Karma¸sık Sistem ˙I¸cin Adım Adım Yakla¸sım:
+1. Genel Yapı
+“Universite ders kayıt sisteminin genel akı¸sını a¸cıkla: giri¸s, ders listesi, ders ¨
+se¸cimi, kontroller, onaylama.
+ChatGPT:
+8s boyunca düşündüm
+Genel Yapı — Üniversite Ders Kayıt Sisteminin Akışı (Adım Adım)
+
+Aşağıda sistemin yüksek seviyeli akışı adım adım, kontrol noktaları ve dikkat edilmesi gereken durumlarla birlikte açıklanmıştır. Amaç: karmaşık kuralları (kontenjan, önkoşul, zaman çakışması, kredi limiti, danışman onayı) güvenli ve öngörülebilir şekilde uygulamak.
+
+1. Giriş (Kimlik doğrulama)
+
+Kullanıcı ara yüzünde öğrenci numarası + şifre alanı göster.
+
+Sunucuya gönderilen bilgiler doğrulanır (Giris_Dogrula):
+
+Başarılı → öğrenci oturumu başlatılır (session/token).
+
+Başarısız → hata mesajı, tekrar deneme veya kilitlenme (brute-force önlemi).
+
+Giriş sonrası öğrenci profili (kaydolmuş dersler, GPA, krediler, geçmiş dersler) yüklenir ve önbelleğe alınır.
+
+Kontrol noktaları: kimlik geçerliliği, oturum süresi, yetki (ör. mezun/aktif öğrenci).
+
+2. Ders Listesi (Görüntüleme)
+
+Sistemdeki mevcut dersler listelenir; her ders için:
+
+ders kodu, adı, kredi, saat(ler), kontenjan, doluluk, önkoşullar, öğretim üyesi.
+
+Filtreleme/arama ve sıralama (bölüm, dönem, gün/saat) sunulur.
+
+Öğrencinin halihazırda aldığı dersler ayrı bir listede gösterilir (çakışma kontrolü kolaylığı için).
+
+Not: Ders verisi güncelliği önemlidir — kontenjan, açık saatler gerçek zamanlı olmalı.
+
+3. Ders Seçimi Akışı
+
+Öğrenci bir dersi seçer (örn. “Derse Ekle”).
+
+Sistem, ders ekleme işlemini bir işlem (transaction) olarak başlatır:
+
+Bu sayede aynı anda birden çok ekleme yarışması varsa (kontenjan yarışları) tutarlılık sağlanır.
+
+Sırasıyla uygulanacak kontroller tetiklenir (aşağıda detaylı).
+
+İpucu: UI’da seçim öncesi hızlı ön kontroller (ör. görünür zaman çakışması işaretleri) göster.
+
+4. Kontroller (Sıralı ve zorunlu)
+
+Her ders ekleme için uygulanacak tipik sıra:
+
+Kontenjan Kontrolü
+
+EGER Kontenjan > 0 ISE devam; değilse reddet.
+
+Bu kontrol transaction içinde çift doğrulama (select-for-update veya optimistic lock) ile yapılmalı.
+
+Önkoşul Kontrolü
+
+Öğrencinin gerekli önkoşul(lar)ı geçmiş olması gerekir.
+
+Eksikse kullanıcıya hangi ders(ler)in gerektiği gösterilir.
+
+Zaman Çakışması Kontrolü
+
+Yeni dersin saatleri, öğrencinin mevcut dersleriyle çakışmamalı.
+
+Çakışma varsa görsel uyarı ve alternatif saat/şema önerisi sun.
+
+Kredi Limiti Kontrolü
+
+EGER toplam_kredi + ders_kredi ≤ 35 ISE devam; değilse reddet.
+
+Geçici kredi hesaplaması, eş zamanlı işlemler için yine transaction içinde doğrulanmalı.
+
+Danışman Onayı Kontrolü
+
+Eğer GPA < 2.5 veya özel durumlar (özel ders, izinli ders) varsa danışman onayı gereklidir.
+
+Onay akışı: otomatik bildirim → danışman onayı bekleme durumu → onay gelirse ders ekleme tamamlanır.
+
+Kural İhlalleri / İstisnalar
+
+Mezuniyet koşulları, burs koşulları veya özel izinler gibi ekstra kurallar varsa bunlar da devreye girer.
+
+Her adımda: başarısızlık durumunda kullanıcıya açık, eyleme geçirici hata mesajı ver.
+
+5. Onaylama ve Kalıcı Kayıt
+
+Tüm kontroller geçerse:
+
+Ders öğrenci kaydına eklenir, kontenjan düşürülür — atomik işlem.
+
+İşlem log kaydı oluşturulur (kullanıcı, zaman, işlem türü).
+
+Kullanıcıya anlık geri bildirim: “Ders eklendi — güncel kredi: X”.
+
+Eğer danışman onayı gerekiyorsa: ders geçici listede bekler, onay sonrası tamamlama yapılır.
+
+Rollback senaryoları: Veri tabanı hatası veya eşzamanlı çatışma halinde yapılan değişiklikler geri alınmalı ve kullanıcı bilgilendirilmeli.
+
+6. Ders Çıkarma Akışı
+
+Kullanıcı “Ders Çıkar” seçer.
+
+Sistem, ilgili dersi kayıttan çıkarır, kredi güncellemesi ve kontenjan artışı yapılır.
+
+Çıkarma sonrası, programdan çıkma/mezuniyet gereksinimleri etkileniyorsa öğrenci uyarılır.
+
+7. Kayıt Özeti ve Son Onay
+
+Öğrenci “Kayıt Tamamla” seçeneğiyle kayıt özetini görür:
+
+Seçilen dersler, toplam kredi, varsa danışman onay bekleyen dersler.
+
+Kullanıcı onay verirse kayıt kesinleşir; çıktı/özet PDF üretilebilir.
+
+Sistem kayıt onayı e-posta veya öğrenci portalına bildirir.
+
+8. Ek Teknik ve İş Akışı Notları
+
+Eşzamanlılık (Concurrency): Kontenjan sayımı ve kredi hesapları için DB transaction / locking mekanizmaları kullanın (pessimistic ya da optimistic).
+
+İşlem Günlüğü (Audit): Tüm ekleme/çıkarma işlemleri loglanmalı (hesap verebilirlik).
+
+Rollback & Hata Yönetimi: Kısmi başarı durumları olmamalı; başarısız işlemler tam geri alınmalı.
+
+Kullanıcı Deneyimi: Hataları açık şekilde göster (neden eklenemedi, hangi adımlar gerekli).
+
+Performans: Ders listesi ve saat çakışma kontrolleri cache/indeks ile hızlandırılmalı.
+
+Test Senaryoları: Birim test + entegrasyon testleri; özellikle yarışma (race) ve sınır (edge) durumlarını test et.
+
+Uyumluluk: Mezuniyet, BSc/MS özel kuralları, çift anadal, yatay geçiş senaryoları göz önünde bulundurulmalı.
+
+Özet Akış (kısa)
+
+Giriş → 2. Ders Listesi Görüntüle → 3. Ders Seç → 4. (Kontenjan → Önkoşul → Zaman Çakışması → Kredi Limiti → Danışman Onayı) → 5. Onay & Kalıcı Kayıt → 6. Kayıt Özeti & Son Onay
+
+İstersen bu genel akışı alıp:
+
+kısa BASLA/BITIR pseudocode’a dönüştüreyim, veya
+
+adımları içeren DOT akış diyagramı (subgraph/cluster ile kontrolleri gösterir) üreteyim.
+Hangi formatı istersin?
+
+Şunu dedin:
+2. Kontrol Mekanizmaları
+“Ders kaydında yapılması gereken kontrolleri listele: kontenjan, ¨on ko¸sul,
+zaman ¸cakı¸sması, kredi limiti, danı¸sman onayı.”
+ChatGPT:
+
+Elbette 👇
+Aşağıda Üniversite Ders Kayıt Sistemi için gerekli tüm kontrol mekanizmaları adım adım ve açıklamalı biçimde listelenmiştir.
+Bu bölüm, sistemin doğruluk ve bütünlüğünü sağlayan ana denetim adımlarını gösterir.
+
+🎯 2. Kontrol Mekanizmaları
+1. Kontenjan Kontrolü
+
+Amaç: Dersi alabilecek maksimum öğrenci sayısının aşılmaması.
+İşleyiş:
+
+Sistem, seçilen dersin mevcut kontenjanını kontrol eder.
+
+EĞER kontenjan > 0 İSE → devam et.
+
+DEĞİLSE → “Kontenjan dolu, ders seçilemez.” uyarısı ver.
+Not: Gerçek zamanlı doğrulama yapılmalı (başka öğrenciler aynı anda ders ekleyebilir).
+
+2. Ön Koşul Dersi Kontrolü
+
+Amaç: Öğrencinin seçtiği ders için gerekli temel ders(ler)i daha önce başarıyla tamamlamış olması.
+İşleyiş:
+
+Her dersin sistemde tanımlı ön koşul listesi vardır.
+
+EĞER öğrencinin geçmiş dersleri içinde ön koşul(lar) bulunuyorsa → devam.
+
+DEĞİLSE → “Bu dersi alabilmek için şu dersleri tamamlamalısınız: …” uyarısı.
+Örnek: “Veri Yapıları” dersi için ön koşul = “Programlamaya Giriş”.
+
+3. Zaman Çakışması Kontrolü
+
+Amaç: Öğrencinin haftalık ders programında iki dersin aynı gün ve saatte çakışmamasını sağlamak.
+İşleyiş:
+
+Yeni seçilen dersin saat aralıkları mevcut kayıtlı derslerle karşılaştırılır.
+
+EĞER gün/saat çakışması VARSA → “Zaman çakışması: Pazartesi 10:00 - 12:00” uyarısı.
+
+DEĞİLSE → devam.
+Not: Aynı dersin farklı şubeleri için otomatik öneri sunulabilir.
+
+4. Kredi Limiti Kontrolü
+
+Amaç: Öğrencinin toplam kredi yükünün yönetmelikte belirlenen sınırı (örneğin 35 AKTS) aşmaması.
+İşleyiş:
+
+Toplam alınan ders kredileri toplanır.
+
+EĞER toplam_kredi + yeni_ders_kredisi ≤ 35 İSE → devam.
+
+DEĞİLSE → “Kredi limiti aşıldı, en fazla 35 krediye kadar ders seçebilirsiniz.”
+Not: Bazı durumlarda (örneğin son dönem öğrencileri) özel izinle bu limit esnetilebilir.
+
+5. Danışman Onayı Kontrolü
+
+Amaç: Belirli durumlarda (örneğin düşük not ortalaması) öğrencinin seçtiği derslerin danışman onayına sunulması.
+İşleyiş:
+
+EĞER GPA < 2.50 İSE → danışman onayı zorunlu.
+
+EĞER GPA ≥ 2.50 İSE → otomatik onay.
+
+Onay bekleyen dersler “Geçici Liste”de tutulur.
+
+Danışman onay verince ders kaydı kesinleşir.
+Not: Bu aşama öğrencinin akademik durumuna göre dinamik olmalıdır.
+
+🔍 Özet Akış
+Kontrol Türü	Amaç	Sonuç (Koşul Sağlanmazsa)
+Kontenjan	Sınıf doluluğunu aşma	“Kontenjan dolu”
+Ön Koşul	Temel bilgi eksikliği	“Ön koşul dersi eksik”
+Zaman Çakışması	Program tutarsızlığı	“Zaman çakışması var”
+Kredi Limiti	Fazla yüklenme	“Kredi limiti aşıldı”
+Danışman Onayı	Akademik izleme	“Danışman onayı bekleniyor”
+
+İstersen şimdi bu kontrol mekanizmalarını, yukarıdaki açıklamalarıyla birlikte pseudocode biçimine çevirebilirim (EGER–ISE–DEĞİLSE yapısıyla).
+Yapayım mı?
+
+Şunu dedin:
+Karma¸sık Sistem ˙I¸cin Adım Adım Yakla¸sım:
+1. Genel Yapı
+“Universite ders kayıt sisteminin genel akı¸sını a¸cıkla: giri¸s, ders listesi, ders ¨
+se¸cimi, kontroller, onaylama.”
+2. Kontrol Mekanizmaları
+“Ders kaydında yapılması gereken kontrolleri listele: kontenjan, ¨on ko¸sul,
+zaman ¸cakı¸sması, kredi limiti, danı¸sman onayı.”
+3. Pseudocode Olu¸sturma
+“T¨um bu kontrollerle birlikte detaylı pseudocode yaz. ˙
+I¸c i¸ce EGER- ˘ ˙
+ISE
+yapıları ve d¨ong¨uler kullan.”
+4. DOT D¨on¨u¸s¨um¨u
+“Bu pseudocode’u Graphviz DOT diline ¸cevir. Her kontrol noktasını
+diamond ile g¨oster.”
+F.U - O.M.K (TF Yazılım M¨uh.) ¨ Hafta 2 - Akı¸s Diyagramları Lab 5 Ekim 2025
+ChatGPT:
+
+Harika! 🎯
+Senin verdiğin adım adım yaklaşımı alıp, “Üniversite Ders Kayıt Sistemi” için tamamlanmış bir tam çözüm hazırlayabiliriz.
+Adımlar şöyle ilerleyecek:
+
+1. Genel Yapı
+
+Sistem akışı yüksek seviyede şöyle:
+
+Giriş
+
+Öğrenci numarası + şifre ile doğrulama.
+
+Başarılıysa öğrenci portalına yönlendirme, başarısızsa hata mesajı ve çıkış.
+
+Ders Listesi
+
+Tüm dersler listelenir; kredi, saat, kontenjan, önkoşul bilgileri gösterilir.
+
+Öğrencinin mevcut dersleri ve toplam kredisi de görünür.
+
+Ders Seçimi
+
+Öğrenci ders ekleme veya çıkarma işlemi yapar.
+
+İşlem sırasında tüm kontroller (kontenjan, önkoşul, zaman çakışması, kredi limiti, danışman onayı) uygulanır.
+
+Kontroller
+
+Her ders ekleme işleminde kontenjan, önkoşul, zaman çakışması, kredi limiti ve gerekirse danışman onayı kontrol edilir.
+
+Onaylama
+
+Tüm ders ekleme/çıkarma işlemleri tamamlandıktan sonra öğrenciye kayıt özeti gösterilir.
+
+Öğrenci onay verdikten sonra kayıt sistemi tarafından kalıcı olarak kaydedilir.
+
+2. Kontrol Mekanizmaları
+
+Kontenjan Kontrolü – Dersin kapasitesinin dolu olup olmadığını kontrol eder.
+
+Ön Koşul Dersi Kontrolü – Seçilen ders için gerekli temel derslerin tamamlanıp tamamlanmadığını kontrol eder.
+
+Zaman Çakışması Kontrolü – Yeni dersin mevcut derslerle saat çakışmasını kontrol eder.
+
+Kredi Limiti Kontrolü – Toplam kredinin 35’i aşmamasını sağlar.
+
+Danışman Onayı Kontrolü – GPA 2.5’in altında ise dersin danışman onayı gereklidir.
+
+3. Pseudocode
+BASLA
+
+    // Öğrenci Girişi
+    Yaz("Öğrenci No:")
+    ogr_no = Girdi_Al()
+    Yaz("Şifre:")
+    sifre = Girdi_Al()
+
+    EGER Giris_Dogrula(ogr_no, sifre) ISE
+        Yaz("Giriş başarılı")
+    DEGILSE
+        Yaz("Hatalı giriş! Sistem sonlandırılıyor.")
+        BITIR
+    SON
+
+    toplam_kredi = 0
+    DONGU kayıt_devam == TRUE
+
+        Yaz("1-Ders Ekle, 2-Ders Çıkar, 0-Kayıt Tamamla")
+        secim = Girdi_Al()
+
+        EGER secim == 1 ISE
+            Yaz("Eklemek istediğiniz ders kodunu giriniz:")
+            ders = Girdi_Al()
+
+            // Kontenjan Kontrolü
+            EGER Kontenjan_Mevcut_Mu(ders) ISE
+
+                // Önkoşul Kontrolü
+                EGER Onkosul_Saglandi_Mi(ogr_no, ders) ISE
+
+                    // Zaman Çakışması Kontrolü
+                    EGER Zaman_Cakismasi_Yok_Mu(ogr_no, ders) ISE
+
+                        // Kredi Limiti Kontrolü
+                        ders_kredi = Ders_Kredisi(ders)
+                        EGER toplam_kredi + ders_kredi <= 35 ISE
+                            Ders_Ekle(ogr_no, ders)
+                            toplam_kredi += ders_kredi
+                            Yaz("Ders eklendi. Toplam kredi: " + toplam_kredi)
+                        DEGILSE
+                            Yaz("Kredi limiti aşıldı!")
+                        SON
+
+                    DEGILSE
+                        Yaz("Zaman çakışması var!")
+                    SON
+
+                DEGILSE
+                    Yaz("Önkoşul dersi eksik!")
+                SON
+
+            DEGILSE
+                Yaz("Kontenjan dolu!")
+            SON
+
+        DEGILSE EGER secim == 2 ISE
+            Yaz("Çıkarmak istediğiniz ders kodunu giriniz:")
+            ders = Girdi_Al()
+            Ders_Cikar(ogr_no, ders)
+            toplam_kredi -= Ders_Kredisi(ders)
+            Yaz("Ders çıkarıldı. Toplam kredi: " + toplam_kredi)
+
+        DEGILSE EGER secim == 0 ISE
+            kayıt_devam = FALSE
+        DEGILSE
+            Yaz("Geçersiz seçim.")
+        SON
+
+    SON
+
+    // Danışman Onayı Kontrolü
+    EGER GPA_Hesapla(ogr_no) < 2.5 ISE
+        Yaz("Danışman onayı gerekli")
+        Danisman_Onayi_Al(ogr_no)
+    DEGILSE
+        Yaz("Danışman onayı gerekmez")
+    SON
+
+    Kayit_Ozetini_Goster(ogr_no)
+    Yaz("Onaylamak için 'E' giriniz:")
+    onay = Girdi_Al()
+    EGER onay == "E" ISE
+        Yaz("Kayıt tamamlandı!")
+    DEGILSE
+        Yaz("Kayıt iptal edildi")
+    SON
+
+BITIR
+
+4. DOT Dönüşümü (Graphviz)
+digraph DersKayitSistemi {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+
+    Start [label="Başla"];
+    Giris [label="Öğrenci Girişi"];
+    Menu [label="1-Ders Ekle\n2-Ders Çıkar\n0-Kayıt Tamamla"];
+
+    // Kontroller
+    Kontenjan [label="Kontenjan Mevcut?", shape=diamond];
+    Onkosul [label="Önkoşul Tamam?", shape=diamond];
+    Zaman [label="Zaman Çakışması?", shape=diamond];
+    Kredi [label="Kredi Limiti?", shape=diamond];
+    Danisman [label="Danışman Onayı?", shape=diamond];
+
+    Ekle [label="Ders Ekle"];
+    Cikar [label="Ders Çıkar"];
+    Ozeti [label="Kayıt Özeti ve Onay"];
+    Bitis [label="Bitir"];
+
+    Start -> Giris -> Menu;
+    Menu -> Ekle [label="1"];
+    Menu -> Cikar [label="2"];
+    Menu -> Ozeti [label="0"];
+
+    Ekle -> Kontenjan;
+    Kontenjan -> Onkosul [label="Evet"];
+    Kontenjan -> Menu [label="Hayır"];
+
+    Onkosul -> Zaman [label="Evet"];
+    Onkosul -> Menu [label="Hayır"];
+
+    Zaman -> Kredi [label="Evet"];
+    Zaman -> Menu [label="Hayır"];
+
+    Kredi -> Danisman [label="Evet"];
+    Kredi -> Menu [label="Hayır"];
+
+    Danisman -> Menu [label="Onay Alındı"];
+    Danisman -> Menu [label="Onay Bekliyor"];
+
+    Cikar -> Menu;
+    Ozeti -> Bitis;
+}
+
+
+Bu dört adımı tamamlayarak karmaşık ders kayıt sistemi için hem pseudocode hem de akış diyagramı hazır hale getirdik.
+
+İstersen ben bunu tam PDF akış diyagramı olarak da üretebilirim, subgraph ile kontrolleri renkli gösterecek şekilde. Bunu yapayım mı?

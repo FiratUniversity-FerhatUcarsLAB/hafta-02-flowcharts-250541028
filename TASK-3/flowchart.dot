@@ -1,0 +1,57 @@
+AD SOYAD NUH DAĞ
+ÖĞRENCİ NO:250541028
+
+digraph HastaneSistemi {
+    layout=dot;
+    rankdir=TB;
+    node [shape=box, style=rounded, fontname="Arial", fontsize=11];
+
+    // Ana Menü
+    Start [label="Başla"];
+    Menu [label="Ana Menü: 1-Randevu Al, 2-Tahlil Gör, 0-Çıkış"];
+    Exit [label="Çıkış"];
+    End [label="Bitiş"];
+
+    Start -> Menu;
+
+    // --- MODÜL 1: Randevu Alma ---
+    subgraph cluster_Randevu {
+        label="Randevu Modülü";
+        color=lightblue;
+        style=filled;
+        fillcolor="#E6F2FF";
+
+        R1 [label="TC Doğrulama"];
+        R2 [label="Poliklinik Seçimi"];
+        R3 [label="Doktor Seçimi"];
+        R4 [label="Uygun Saat Seçimi"];
+        R5 [label="Randevu Onayı ve SMS Gönderimi"];
+
+        R1 -> R2 -> R3 -> R4 -> R5;
+    }
+
+    // --- MODÜL 2: Tahlil Sonuçları ---
+    subgraph cluster_Tahlil {
+        label="Tahlil Sonuçları Modülü";
+        color=lightgreen;
+        style=filled;
+        fillcolor="#E9FFE9";
+
+        T1 [label="TC Doğrulama"];
+        T2 [label="Tahlil Varlığı Kontrolü"];
+        T3 [label="Sonuç Hazır mı?"];
+        T4 [label="Sonucu Görüntüle"];
+        T5 [label="PDF İndir"];
+
+        T1 -> T2 -> T3;
+        T3 -> T4 [label="Hazır"];
+        T3 -> T2 [label="Hazır Değil"];
+        T4 -> T5;
+    }
+
+    // Menü bağlantıları
+    Menu -> R1 [label="1 - Randevu Al"];
+    Menu -> T1 [label="2 - Tahlil Gör"];
+    Menu -> Exit [label="0 - Çıkış"];
+    Exit -> End;
+}

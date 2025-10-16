@@ -1,0 +1,192 @@
+AD SOYAD:NUH DAĞ
+ÖĞRENCİ NO:250541028
+
+G¨orev 5: Akıllı Ev G¨uvenlik Sistemi
+Sistem A¸cıklaması
+IoT tabanlı akıllı ev g¨uvenlik sisteminin alarm ve bildirim s¨ure¸clerini
+modelleyin.
+Sistem Gereksinimleri:
+Sistem aktif mi kontrol¨u (ko¸sul)
+Sens¨or okuma d¨ong¨us¨u (d¨ong¨u - s¨urekli)
+Hareket sens¨or¨u kontrol¨u (ko¸sul)
+Kapı/pencere sens¨or¨u kontrol¨u (ko¸sul)
+Kamera aktivasyonu (ko¸sul)
+Yanlı¸s alarm kontrol¨u (ev sahibi evde mi?) (ko¸sul)
+Alarm seviyesi belirleme (1-d¨u¸s¨uk, 2-orta, 3-y¨uksek) (ko¸sul)
+Bildirim g¨onderme (SMS + App + Email)
+Bekle ve tekrar kontrol et (d¨ong¨u)
+Alarm sıfırlama veya devam ettirme (ko¸sul)
+Zorluk: Orta-Zor
+S¨urekli calısan sistem - sonsuz d¨ong¨u icinde kosullar! F.U - O.M.K (TF Yazılım M¨uh.) ¨ Hafta 2 - Akı¸s Diyagramları Lab 5 Ekim 2025 18 / 32
+G¨orev 5: LLM ile Ger¸cek Zamanlı Sistem
+S¨urekli C¸ alı¸san Sistemler ˙I¸cin:
+Sonsuz D¨ong¨u Yakla¸sımı
+“Akıllı ev g¨uvenlik sistemi 7/24 ¸calı¸sır. Ana d¨ong¨u i¸cinde sens¨or okuma,
+tehdit algılama, alarm verme ve bildirim g¨onderme s¨ure¸clerini i¸ceren
+pseudocode yaz.”
+Ozel Notlar: ¨
+Ana DONG ¨ U s¨urekli ¸calı¸sır (DO ¨ GRU ko¸sulu ile) ˘
+Her d¨ong¨u iterasyonunda t¨um sens¨orler kontrol edilir
+Tehdit seviyesine g¨ore farklı aksiyonlar alınır
+Alarm sıfırlama komutu gelene kadar devam eder
+DOT’ta Sonsuz D¨ong¨u
+DOT dilinde sonsuz d¨ong¨uy¨u g¨ostermek i¸cin geri ok kullanın ve ”S¨urekli”
+etiketi ekleyin.
+F.U - O.M.K (TF Yazılım M¨uh.) ¨ Hafta 2 - Akı¸s Diyagramları Lab 5 Ek
+ChatGPT:
+
+Harika! 🎯
+Senin verdiğin Gorev 5: Akıllı Ev Güvenlik Sistemi açıklamasına göre, sistemi adım adım analiz edip pseudocode ve DOT akış diyagramı hazırlayabiliriz.
+
+Aşağıda tüm adımlar özetlenmiş ve detaylı pseudocode hazırlanmıştır.
+
+1. Genel Yapı — Akıllı Ev Güvenlik Sistemi
+
+Sistem Aktif Kontrolü
+
+Sistem aktif değilse, sensörler ve alarm çalışmaz.
+
+Sistem aktifse, ana döngü çalışır.
+
+Sensör Okuma Döngüsü (Sürekli)
+
+Hareket sensörleri, kapı/pencere sensörleri sürekli okunur.
+
+Her döngü iterasyonunda tüm sensörlerden veri alınır.
+
+Alarm ve Bildirim Kontrolleri
+
+Tehdit algılanırsa (hareket veya kapı/pencere açılması):
+
+Kamera aktivasyonu.
+
+Yanlış alarm kontrolü (ev sahibi evde mi?).
+
+Alarm seviyesi belirleme: 1-düşük, 2-orta, 3-yüksek.
+
+Bildirim gönderme (SMS, App, Email).
+
+Alarm sıfırlanana kadar veya ev sahibi onaylayana kadar alarm aktif kalır.
+
+Bekleme ve Tekrar Kontrol
+
+Döngü sürekli çalışır (sonsuz döngü).
+
+Her iterasyonda sensörler tekrar okunur ve kontroller yenilenir.
+
+2. Kontrol Mekanizmaları
+
+Sistem Aktif mi? → EGER sistem_aktif ISE
+
+Hareket Sensörü Algıladı mı? → EGER hareket_var ISE
+
+Kapı/Pencere Sensörü Açık mı? → EGER kapi_pencere_acik ISE
+
+Yanlış Alarm Kontrolü → EGER ev_sahibi_evde DEGILSE
+
+Alarm Seviyesi Belirleme → 1-düşük, 2-orta, 3-yüksek
+
+Bildirim Gönderme → SMS, App, Email
+
+Alarm Sıfırlama veya Devam Ettirme → EGER alarm_sifirlandi ISE
+
+3. Pseudocode — Sürekli Çalışan Sistem
+BASLA
+
+    EGER sistem_aktif DEGILSE
+        Yaz("Sistem kapalı. Çalıştırmak için aktif edin.")
+        BITIR
+    SON
+
+    // Sonsuz döngü: sürekli sensör okuma ve alarm kontrolü
+    DONGU DOĞRU
+
+        // Sensör okuma
+        hareket_var = Hareket_Sensor_Oku()
+        kapi_pencere_acik = Kapi_Pencere_Sensor_Oku()
+        alarm_sifirlandi = Alarm_Sifirlama_Kontrol()
+        ev_sahibi_evde = Ev_Sahibi_Kontrol()
+
+        // Tehdit Algılama
+        EGER hareket_var ISE
+            Kamera_Aktive_Et()
+        SON
+
+        EGER kapi_pencere_acik ISE
+            Kamera_Aktive_Et()
+        SON
+
+        // Yanlış alarm kontrolü
+        EGER ev_sahibi_evde ISE
+            Yaz("Yanlış alarm. Alarm devreye girmedi.")
+        DEGILSE
+            // Alarm seviyesi belirleme
+            EGER hareket_var VE kapi_pencere_acik ISE
+                alarm_seviyesi = 3 // yüksek
+            DEGILSE EGER hareket_var ISE
+                alarm_seviyesi = 2 // orta
+            DEGILSE
+                alarm_seviyesi = 1 // düşük
+            SON
+
+            // Alarmı aktive et ve bildirim gönder
+            Alarm_Aktif_Et(alarm_seviyesi)
+            Bildirim_Gonder(SMS, App, Email, alarm_seviyesi)
+        SON
+
+        // Alarm sıfırlama kontrolü
+        EGER alarm_sifirlandi ISE
+            Alarm_Sifirla()
+        SON
+
+        Bekle(1 saniye) // Döngü tekrar başlat
+    SON
+
+BITIR
+
+4. DOT Dönüşümü — Graphviz Akış Diyagramı
+digraph AkilliEvSistemi {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+
+    Start [label="Başla"];
+    SistemAktif [label="Sistem Aktif mi?", shape=diamond];
+    SonsuzDongu [label="Sonsuz Döngü", shape=box];
+
+    Hareket [label="Hareket Sensörü?", shape=diamond];
+    KapiPencere [label="Kapı/Pencere Açık?", shape=diamond];
+    EvSahibi [label="Ev Sahibi Evde mi?", shape=diamond];
+    AlarmSeviye [label="Alarm Seviyesi Belirle", shape=box];
+    Bildirim [label="Bildirim Gönder (SMS, App, Email)", shape=box];
+    AlarmSifirla [label="Alarm Sıfırla?", shape=diamond];
+    End [label="Bitir"];
+
+    Start -> SistemAktif;
+    SistemAktif -> SonsuzDongu [label="Evet"];
+    SistemAktif -> End [label="Hayır"];
+
+    SonsuzDongu -> Hareket;
+    Hareket -> KapiPencere [label="Evet"];
+    Hareket -> EvSahibi [label="Hayır"];
+
+    KapiPencere -> EvSahibi [label="Evet"];
+    KapiPencere -> AlarmSeviye [label="Hayır"];
+
+    EvSahibi -> AlarmSeviye [label="Hayır"];
+    EvSahibi -> SonsuzDongu [label="Evet"];
+
+    AlarmSeviye -> Bildirim;
+    Bildirim -> AlarmSifirla;
+    AlarmSifirla -> SonsuzDongu [label="Devam", color=blue];
+    AlarmSifirla -> SonsuzDongu [label="Sıfırlandı", color=green];
+}
+
+
+Not:
+
+Sonsuz döngü, geri ok ile (SonsuzDongu -> Hareket) gösterildi ve “Sürekli” çalıştığı etiketlendi.
+
+Karar noktaları (diamond) ile sensör kontrolleri ve yanlış alarm yönetimi görselleştirildi.
+
+İstersen ben bunun tam PDF raporunu pseudocode ve DOT diyagramı ile birlikte hazırlayabilirim.
+Bunu yapmamı ister misin?

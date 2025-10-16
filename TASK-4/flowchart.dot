@@ -1,0 +1,47 @@
+AD SOYAD:NUH DAĞ
+ÖĞRENCİ NO:250541028
+
+digraph DersKayitSistemi {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+
+    Start [label="Başla"];
+    Giris [label="Öğrenci Girişi"];
+    Menu [label="1-Ders Ekle\n2-Ders Çıkar\n0-Kayıt Tamamla"];
+
+    // Kontroller
+    Kontenjan [label="Kontenjan Mevcut?", shape=diamond];
+    Onkosul [label="Önkoşul Tamam?", shape=diamond];
+    Zaman [label="Zaman Çakışması?", shape=diamond];
+    Kredi [label="Kredi Limiti?", shape=diamond];
+    Danisman [label="Danışman Onayı?", shape=diamond];
+
+    Ekle [label="Ders Ekle"];
+    Cikar [label="Ders Çıkar"];
+    Ozeti [label="Kayıt Özeti ve Onay"];
+    Bitis [label="Bitir"];
+
+    Start -> Giris -> Menu;
+    Menu -> Ekle [label="1"];
+    Menu -> Cikar [label="2"];
+    Menu -> Ozeti [label="0"];
+
+    Ekle -> Kontenjan;
+    Kontenjan -> Onkosul [label="Evet"];
+    Kontenjan -> Menu [label="Hayır"];
+
+    Onkosul -> Zaman [label="Evet"];
+    Onkosul -> Menu [label="Hayır"];
+
+    Zaman -> Kredi [label="Evet"];
+    Zaman -> Menu [label="Hayır"];
+
+    Kredi -> Danisman [label="Evet"];
+    Kredi -> Menu [label="Hayır"];
+
+    Danisman -> Menu [label="Onay Alındı"];
+    Danisman -> Menu [label="Onay Bekliyor"];
+
+    Cikar -> Menu;
+    Ozeti -> Bitis;
+}

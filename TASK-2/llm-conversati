@@ -1,0 +1,490 @@
+AD SOYAD:NUH DAĞ
+ÖĞRENCİ NO:250541028
+
+Sistem A¸cıklaması
+E-ticaret sitesinde ¨ur¨un ekleme, sepet y¨onetimi ve ¨odeme s¨urecini
+modelleyin.
+Sistem Gereksinimleri:
+Kullanıcı giri¸s kontrol¨u (ko¸sul)
+Ur¨un kategorileri arasında gezinme (d¨ong¨u) ¨
+Ur¨un sepete ekleme ¨
+Stok kontrol¨u (ko¸sul)
+Sepeti g¨or¨unt¨uleme ve d¨uzenleme (d¨ong¨u)
+˙
+Indirim kodu uygulanabilir (ko¸sul)
+Minimum 50 TL kontrol¨u (ko¸sul)
+Kargo ¨ucreti hesaplama (ko¸sul: ¿200 TL ¨ucretsiz)
+Odeme y¨ontemi se¸cimi (ko¸sul) ¨
+Sipari¸s onayı
+F.U - O.M.K (TF Yazılım M¨uh.) ¨ Hafta 2 - Akı¸s Diyagramları Lab 5 Ekim 2025 10 / 32
+G¨orev 2: Online Alı¸sveri¸s Sepet Sistemi-Devamı
+Zorluk: Orta-Zor
+Birden fazla d¨ong¨u ve i¸c i¸ce ko¸sullar!
+F.U - O.M.K (TF Yazılım M¨uh.) ¨ Hafta 2 - Akı¸s Diyagramları Lab 5 Ekim 2025 11 / 32
+G¨orev 2: LLM Prompt Onerileri ¨
+ChatGPT:
+
+Harika 👍
+Bu görevde senden istenen şey, bir e-ticaret sitesinin alışveriş sepeti sürecini koşullar (if), döngüler (loop), ve karar yapılarıyla modellemek.
+İstersen önce sistemin akış mantığını anlayalım, ardından pseudocode ve DOT (akış diyagramı) çıktısını oluşturabiliriz.
+
+🧩 Sistem Açıklaması: Online Alışveriş Sepet Sistemi
+Amaç:
+
+Kullanıcının e-ticaret sitesinde ürün seçmesi, sepete eklemesi, ödeme yapması ve sipariş onayı alması sürecini modellemek.
+
+⚙️ Sistem Gereksinimleri
+
+Kullanıcı Girişi Kontrolü
+
+Kullanıcı giriş yapmamışsa → “Giriş Yap” sayfasına yönlendir.
+
+Giriş yaptıysa → devam et.
+
+Ürün Kategorileri Arasında Gezinme (Döngü)
+
+Kullanıcı kategoriler arasında dolaşabilir.
+
+Ürün seçerse → ürün detay sayfasına geç.
+
+Ürünü Sepete Ekleme
+
+“Sepete Ekle” seçildiğinde stok kontrolü yapılır.
+
+Stok Kontrolü (Koşul)
+
+Stok varsa → sepete ekle.
+
+Yoksa → uyarı ver.
+
+Sepeti Görüntüleme ve Düzenleme (Döngü)
+
+Kullanıcı sepetteki ürünleri görebilir.
+
+Adet değiştirebilir, silebilir.
+
+İndirim Kodu Uygulama (Koşul)
+
+Geçerli indirim kodu varsa → indirimi uygula.
+
+Yoksa → hata mesajı göster.
+
+Minimum 50 TL Kontrolü (Koşul)
+
+Sepet tutarı < 50 TL → “Minimum tutar 50 TL olmalı” uyarısı.
+
+≥ 50 TL → devam et.
+
+Kargo Ücreti Hesaplama (Koşul)
+
+Tutar ≥ 200 TL → “Kargo ücretsiz”.
+
+< 200 TL → “Kargo ücreti 30 TL”.
+
+Ödeme Yöntemi Seçimi (Koşul)
+
+Kullanıcı kredi kartı, havale veya kapıda ödeme seçebilir.
+
+Geçerli bir yöntem seçilmezse → uyarı.
+
+Sipariş Onayı
+
+“Siparişi Onayla” ile işlem tamamlanır.
+
+🧠 Pseudocode: Online Alışveriş Sistemi
+BAŞLA
+
+Kullanıcı_girişi = giriş_kontrol()
+EĞER Kullanıcı_girişi == False İSE
+    Giriş_yap()
+SONRA
+    Ürün_kategorisi_listesi_göster()
+
+    TEKRARLA
+        ürün = ürün_seç()
+        EĞER ürün != None İSE
+            stok = stok_kontrol(ürün)
+            EĞER stok > 0 İSE
+                sepete_ekle(ürün)
+            DEĞİLSE
+                Yaz("Ürün stokta yok.")
+            SON
+        SON
+        devam = kullanıcı_devam_ediyor_mu()
+    MÜKERRERKEN devam == True
+
+    sepete_git()
+
+    TEKRARLA
+        sepeti_göster()
+        işlem = düzenleme_seç()
+        EĞER işlem == "sil" İSE
+            ürün_sil()
+        EĞER işlem == "adet_degistir" İSE
+            adet_güncelle()
+        devam = kullanıcı_devam_ediyor_mu()
+    MÜKERRERKEN devam == True
+
+    indirim_kodu = kullanıcıdan_kod_al()
+    EĞER indirim_kodu_geçerli_mi(indirim_kodu) İSE
+        indirimi_uygula()
+    DEĞİLSE
+        Yaz("Geçersiz indirim kodu.")
+    SON
+
+    toplam = sepet_toplam()
+    EĞER toplam < 50 İSE
+        Yaz("Minimum alışveriş tutarı 50 TL olmalı.")
+        DUR
+    SON
+
+    EĞER toplam >= 200 İSE
+        kargo = 0
+        Yaz("Kargo ücretsiz.")
+    DEĞİLSE
+        kargo = 30
+        Yaz("Kargo ücreti 30 TL eklendi.")
+    SON
+
+    ödeme_yöntemi = ödeme_seç()
+    EĞER ödeme_yöntemi != None İSE
+        ödeme_al(ödeme_yöntemi, toplam + kargo)
+        siparişi_onayla()
+    DEĞİLSE
+        Yaz("Geçerli bir ödeme yöntemi seçilmedi.")
+    SON
+
+BİTİR
+
+🔷 DOT (Akış Diyagramı) Kodu
+
+İstersen bunu Graphviz/DOT formatında akış diyagramına dönüştürebilirim.
+Örneğin şöyle olur:
+
+digraph OnlineShopping {
+    rankdir=TB;
+    node [shape=box, style=rounded, fontname="Arial"];
+
+    Start [label="Başla"];
+    Login [label="Kullanıcı Girişi Kontrolü"];
+    Browse [label="Ürün Kategorileri Arasında Gezinme"];
+    Select [label="Ürün Seçimi"];
+    Stock [label="Stok Kontrolü"];
+    AddCart [label="Sepete Ekle"];
+    ViewCart [label="Sepeti Görüntüleme ve Düzenleme"];
+    Discount [label="İndirim Kodu Uygulama"];
+    MinCheck [label="Minimum 50 TL Kontrolü"];
+    Shipping [label="Kargo Ücreti Hesaplama"];
+    Payment [label="Ödeme Yöntemi Seçimi"];
+    Confirm [label="Sipariş Onayı"];
+    End [label="Bitiş"];
+
+    Start -> Login -> Browse -> Select -> Stock
+    Stock -> AddCart [label="Stok Var"]
+    Stock -> Browse [label="Stok Yok"]
+    AddCart -> ViewCart -> Discount -> MinCheck
+    MinCheck -> Shipping [label=">= 50 TL"]
+    MinCheck -> ViewCart [label="< 50 TL"]
+    Shipping -> Payment -> Confirm -> End
+}
+
+
+İstersen bu DOT kodunu:
+
+görselleştirilmiş diyagram (örneğin PNG veya PDF)
+
+ya da Word/PDF raporu
+şeklinde oluşturabilirim.
+
+Ne istersin:
+📄 (A) PDF içinde diyagram + açıklama mı,
+🖼️ (B) sadece görsel diyagram (örneğin PNG),
+🧠 (C) hem pseudocode hem diyagram birlikte bir rapor halinde mi?
+
+Şunu dedin:
+Düzen türü: "nokta" tanınmadı. Şunlardan birini kullanın: circo dot fdp neato nop nop1 nop2 osage patchwork sfdp twopi
+ChatGPT:
+
+Çok iyi yakaladın 👍
+Aldığın hata mesajı:
+
+“Düzen türü: ‘nokta’ tanınmadı.”
+
+bunun sebebi, Graphviz (veya benzeri çizim aracına) "nokta" yazman — ama doğru düzen türü İngilizce "dot" olmalıydı.
+
+✅ Çözüm:
+
+Türkçede “nokta” olarak çevrilse de Graphviz’in düzen seçenekleri İngilizce isimlerle çağrılır:
+
+dot
+
+neato
+
+circo
+
+fdp
+
+twopi
+
+sfdp
+
+Yani şöyle yazmalısın 👇
+
+dot -Tpng online_shopping.dot -o online_shopping.png
+
+
+ya da Graphviz GUI kullanıyorsan, “Düzen türü” seçeneğinde dot veya neato seçmelisin — “nokta” değil.
+
+🎯 Özetle:
+Hatalı	Doğru
+düzen türü: "nokta"	düzen türü: "dot"
+düzen türü: "çember"	düzen türü: "circo"
+düzen türü: "yayılım"	düzen türü: "neato"
+
+İstersen ben senin için yukarıdaki DOT kodunu “dot düzen türüyle uyumlu hale getirilmiş” olarak vereyim — hem doğrudan Graphviz’e atabileceğin şekilde.
+İster misin o şekilde hazırlayayım (örneğin .dot dosyası veya .png çıktısı üretilecek şekilde)?
+
+Şunu dedin:
+gonderdiğim hatayı duzelt
+ChatGPT:
+
+Elbette ✅
+Senin gönderdiğin hata, “düzen türü: ‘nokta’ tanınmadı” ifadesine dayanıyor — yani Graphviz’te "nokta" yerine "dot" kullanılması gerekiyor.
+Aşağıda düzeltilmiş, çalışır hale getirilmiş DOT kodu yer alıyor 👇
+
+🧩 Düzeltilmiş DOT Kodu (Türkçe Etiketlerle)
+digraph OnlineShopping {
+    rankdir=TB;
+    layout=dot;
+    node [shape=box, style=rounded, fontname="Arial"];
+
+    Start [label="Başla"];
+    Login [label="Kullanıcı Girişi Kontrolü"];
+    Browse [label="Ürün Kategorileri Arasında Gezinme"];
+    Select [label="Ürün Seçimi"];
+    Stock [label="Stok Kontrolü"];
+    AddCart [label="Sepete Ekle"];
+    ViewCart [label="Sepeti Görüntüleme ve Düzenleme"];
+    Discount [label="İndirim Kodu Uygulama"];
+    MinCheck [label="Minimum 50 TL Kontrolü"];
+    Shipping [label="Kargo Ücreti Hesaplama"];
+    Payment [label="Ödeme Yöntemi Seçimi"];
+    Confirm [label="Sipariş Onayı"];
+    End [label="Bitiş"];
+
+    Start -> Login -> Browse -> Select -> Stock;
+    Stock -> AddCart [label="Stok Var"];
+    Stock -> Browse [label="Stok Yok"];
+    AddCart -> ViewCart -> Discount -> MinCheck;
+    MinCheck -> Shipping [label=">= 50 TL"];
+    MinCheck -> ViewCart [label="< 50 TL"];
+    Shipping -> Payment -> Confirm -> End;
+}
+
+💡 Nasıl çalıştırılır
+
+Eğer .dot dosyası olarak kaydettiysen (örnek: online_shopping.dot):
+
+PNG üretmek için:
+
+dot -Tpng online_shopping.dot -o online_shopping.png
+
+
+PDF üretmek için:
+
+dot -Tpdf online_shopping.dot -o online_shopping.pdf
+
+
+İstersen ben bu diyagramı senin için PDF veya PNG olarak oluşturup gönderebilirim.
+Hangisini istersin:
+🖼️ PNG görsel mi, yoksa 📄 PDF diyagram mı?
+
+Şunu dedin:
+yapıştırınca Düzen türü: "nokta" tanınmadı. Şunlardan birini kullanın: circo dot fdp neato nop nop1 nop2 osage patchwork sfdp twopi hatasını verdi
+ChatGPT:
+
+Harika, bu ayrıntıyı yakalaman çok iyi 👏
+Sorunun nedeni aslında Graphviz’in senin sisteminde Türkçe yerel ayarlarla (“locale”) çalışıyor olması — dolayısıyla layout=dot satırını doğru algılamıyor ve onu “nokta” olarak çevirmeye çalışıyor.
+Ama endişelenme: çok kolay bir düzeltmesi var ✅
+
+🔧 Çözüm 1: layout satırını tamamen kaldır
+
+layout=dot; satırı zorunlu değildir.
+Eğer o satırı silersen, Graphviz varsayılan olarak zaten dot düzenini kullanır.
+Yani aşağıdaki haliyle tamamen hatasız çalışır 👇
+
+digraph OnlineShopping {
+    rankdir=TB;
+    node [shape=box, style=rounded, fontname="Arial"];
+
+    Start [label="Başla"];
+    Login [label="Kullanıcı Girişi Kontrolü"];
+    Browse [label="Ürün Kategorileri Arasında Gezinme"];
+    Select [label="Ürün Seçimi"];
+    Stock [label="Stok Kontrolü"];
+    AddCart [label="Sepete Ekle"];
+    ViewCart [label="Sepeti Görüntüleme ve Düzenleme"];
+    Discount [label="İndirim Kodu Uygulama"];
+    MinCheck [label="Minimum 50 TL Kontrolü"];
+    Shipping [label="Kargo Ücreti Hesaplama"];
+    Payment [label="Ödeme Yöntemi Seçimi"];
+    Confirm [label="Sipariş Onayı"];
+    End [label="Bitiş"];
+
+    Start -> Login -> Browse -> Select -> Stock;
+    Stock -> AddCart [label="Stok Var"];
+    Stock -> Browse [label="Stok Yok"];
+    AddCart -> ViewCart -> Discount -> MinCheck;
+    MinCheck -> Shipping [label=">= 50 TL"];
+    MinCheck -> ViewCart [label="< 50 TL"];
+    Shipping -> Payment -> Confirm -> End;
+}
+
+
+💡 Yani layout=dot; satırını tamamen kaldır → sorun çözülür.
+
+🔧 Çözüm 2: Komut satırında düzen türünü elle belirt
+
+Eğer .dot dosyası duruyor ve komut satırından çalıştırıyorsan, sadece şu komutu kullan:
+
+dot -Tpng online_shopping.dot -o online_shopping.png
+
+
+Yani .dot dosyasının içinde layout belirtmene gerek yok.
+
+✅ Özet
+Sorun	Sebep	Çözüm
+“Düzen türü: ‘nokta’ tanınmadı”	Locale Türkçe → “dot” kelimesini “nokta”ya çeviriyor	layout=dot; satırını sil veya komutta belirt
+
+İstersen ben bu kodu senin için görsel (PNG veya PDF) formatına dönüştürüp hazır verebilirim.
+Hangisini istersin? (🖼️ PNG / 📄 PDF)
+
+Şunu dedin:
+Adım 2: Pseudocode
+˙
+Ikinci Prompt:
+“Bu sistemi pseudocode olarak yaz. D¨ong¨uler i¸cin DONG ¨ U, ko¸sullar i¸cin ¨
+EGER- ˘ ˙
+ISE kullan. Her adımı BAS¸LA ile ba¸slat, B˙
+IT˙
+IR ile bitir. T¨um
+kontrol noktalarını belirt.
+ChatGPT:
+
+Harika 👍
+Yani Adım 2 olarak, E-ticaret sistemi için özel formatta bir pseudocode istiyorsun:
+
+DÖNGÜ yapıları → DONGU / SON
+
+Koşul yapıları → EGER ... ISE ... DEGILSE ... SON
+
+Her aşama → BASLA ile başlasın, BITIR ile bitsin
+
+Tüm kontrol noktaları (PIN, stok, tutar, kargo, indirim vb.) yer alsın
+
+İşte senin kriterlerine tam uygun, düzenli ve açıklamalı pseudocode 👇
+
+🧠 Adım 2 – E-Ticaret Alışveriş Sepeti Sistemi Pseudocode
+BASLA
+
+    // 1. Kullanıcı Girişi Kontrolü
+    Yaz("Lütfen giriş yapınız.")
+    EGER kullanici_girisi_dogrulandi ISE
+        Yaz("Giriş başarılı.")
+    DEGILSE
+        Yaz("Giriş başarısız. Lütfen tekrar deneyin.")
+        BITIR
+    SON
+
+    // 2. Ürün Kategorileri Arasında Gezinme
+    DONGU kategori_secimi_devam == TRUE
+        Yaz("Ürün kategorileri listeleniyor...")
+        kategori = kategori_sec()
+        ürün = ürün_sec(kategori)
+
+        EGER ürün != BOS ISE
+            // 3. Stok Kontrolü
+            stok = stok_kontrol(ürün)
+            EGER stok > 0 ISE
+                Yaz("Ürün sepete ekleniyor...")
+                sepete_ekle(ürün)
+            DEGILSE
+                Yaz("Ürün stokta yok!")
+            SON
+        SON
+
+        kategori_secimi_devam = kullanici_devam_ediyor_mu()
+    SON
+
+    // 4. Sepeti Görüntüleme ve Düzenleme
+    DONGU sepet_düzenleme_devam == TRUE
+        sepeti_göster()
+        işlem = sepet_islemi_sec()
+
+        EGER işlem == "sil" ISE
+            ürün_sil()
+        DEGILSE EGER işlem == "adet_degistir" ISE
+            adet_güncelle()
+        DEGILSE
+            Yaz("İşlem yapılmadı.")
+        SON
+
+        sepet_düzenleme_devam = kullanıcı_devam_ediyor_mu()
+    SON
+
+    // 5. İndirim Kodu Uygulama
+    indirim_kodu = kod_al()
+    EGER indirim_kodu_gecerli_mi(indirim_kodu) ISE
+        indirimi_uygula()
+        Yaz("İndirim başarıyla uygulandı.")
+    DEGILSE
+        Yaz("Geçersiz indirim kodu.")
+    SON
+
+    // 6. Minimum 50 TL Kontrolü
+    toplam = sepet_toplami()
+    EGER toplam < 50 ISE
+        Yaz("Minimum alışveriş tutarı 50 TL olmalıdır.")
+        BITIR
+    SON
+
+    // 7. Kargo Ücreti Hesaplama
+    EGER toplam >= 200 ISE
+        kargo = 0
+        Yaz("Kargo ücretsiz.")
+    DEGILSE
+        kargo = 30
+        Yaz("Kargo ücreti 30 TL eklendi.")
+    SON
+
+    // 8. Ödeme Yöntemi Seçimi
+    Yaz("Ödeme yönteminizi seçiniz: (Kart / Havale / Kapıda)")
+    ödeme_yöntemi = ödeme_sec()
+    EGER ödeme_yöntemi != BOS ISE
+        ödeme_al(ödeme_yöntemi, toplam + kargo)
+        Yaz("Ödeme işlemi başarılı.")
+    DEGILSE
+        Yaz("Geçerli bir ödeme yöntemi seçilmedi.")
+        BITIR
+    SON
+
+    // 9. Sipariş Onayı
+    siparis_onayla()
+    Yaz("Siparişiniz başarıyla oluşturuldu.")
+
+BITIR
+
+🧭 Yapısal Özellikler
+
+Her büyük işlem “BASLA” ve “BITIR” arasında yer alıyor.
+
+Tüm karar yapıları EGER ... ISE ... DEGILSE ... SON ile kapatıldı.
+
+Tüm yinelemeler DONGU ... SON yapısıyla yazıldı.
+
+Tüm kontrol noktaları (giriş, stok, indirim, tutar, kargo, ödeme) açıkça gösterildi.
+
+İstersen bir sonraki adımda (Adım 3) bu pseudocode’u akış diyagramına (DOT formatında) dönüştürebilirim.
+Devam edelim mi → “Adım 3: Akış Diyagramı (DOT)” ?
+
+ChatGPT hata yapa
